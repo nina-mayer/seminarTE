@@ -55,7 +55,7 @@ teachers_full <- teachers_full %>%
 
 
 
-### plot average teacher salary
+### plot average teacher salary (figure 2)
 
 # filter states for clarity: CT(first adopter), NE(last adopter), AK, FL, CA, NY, OH, WA
 sel_states <- c("CT", "NE", "AK", "FL", "CA", "NY", "OH", "WA")
