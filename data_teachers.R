@@ -49,8 +49,8 @@ teachers_treat <- data.frame(state = teachers_treat$teachers_full.State, time = 
 
 teachers_full <- teachers_full %>%
   filter(State %in% teachers_treat$state) %>%
-  filter(year >= 1959) %>%
-  select(-c(agr, pnwht, purban, ESWI, perinc))
+  filter(year >= 1959) #%>%
+  #select(-c(agr, pnwht, purban, ESWI, perinc))
 
 
 
