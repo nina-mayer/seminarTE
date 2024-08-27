@@ -49,8 +49,13 @@ teachers_treat <- data.frame(state = teachers_treat$teachers_full.State, time = 
 
 teachers_full <- teachers_full %>%
   filter(State %in% teachers_treat$state) %>%
-  filter(year >= 1959) #%>%
-  #select(-c(agr, pnwht, purban, ESWI, perinc))
+  filter(year >= 1959) %>%
+  select(-c(Stateid, YearCBrequired, CBstatusby1990, CBrequired_SY, CBeverrequired, idmap,
+            ppexpend, lnppexpend, lnavgteachsal, lnavginstrucsal, lnnonwageppexpend,
+            agr, perinc, pnwht, purban, ESWI)) %>%
+  mutate(across(avginstrucsal, ~replace(., is.na(.), mean(., na.rm = TRUE))), 
+         .by = State) %>%
+  relocate(State)
 
 
 
