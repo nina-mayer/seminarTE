@@ -43,8 +43,10 @@ teachers_treat <- data.frame(state = teachers_treat$teachers_full.State, time = 
 
 
 ### update teachers_full
+
 # delete all states that are not in teachers_treat
 # delete years < 1959 as no info on teacher salary
+# delete all columns correlated to treatment time
 # delete all columns with (almost) only NAs
 
 teachers_full <- teachers_full %>%

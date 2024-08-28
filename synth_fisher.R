@@ -212,9 +212,9 @@ paper_analysis = function() {
   out
   xtable(out, include.rownames=FALSE)
   
-  out = synth_fisher(adoption_Data_2, vars=c("lnincome", "retprice"), verbose=T)
-  out
-  xtable(out, include.rownames=FALSE)
+  #out = synth_fisher(adoption_Data_2, vars=c("lnincome", "retprice"), verbose=T)
+  #out
+  #xtable(out, include.rownames=FALSE)
   
   ## Single data analysis
   pvals = single_DATA_analysis(adoption_Data)

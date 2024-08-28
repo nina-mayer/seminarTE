@@ -58,7 +58,7 @@ synth_fisher = function(adoption, vars=c("nonwageppexpend", "studteachratio"), o
   stopifnot(all(vars %in% colnames(X)))
   
   # Adjust Xit for time trends.
-  for(i in 1:length(teachers_treat)) {
+  for(i in 1:nrow(teachers_treat)) {
     yr  = as.numeric(strsplit(as.character(adoption[i,]$time), "/")[[1]][2])
     st = as.character(adoption[i, ]$state)
     # risk_set = AllStates[which(week >= week[i])]
@@ -83,7 +83,7 @@ synth_fisher = function(adoption, vars=c("nonwageppexpend", "studteachratio"), o
   #' Alabama  293  145.1858  9.765749  0.1755933  -44.3444687  6.510136   84.8046
   #' ...
   
-  status = rep(1, length(teachers_treat))
+  status = rep(1, nrow(teachers_treat))
   status[which(teachers_treat$state=="NE")] = 0
   adoption$event = status
   
@@ -106,18 +106,18 @@ synth_fisher = function(adoption, vars=c("nonwageppexpend", "studteachratio"), o
   # hats.
   yhat = exp(X %*% as.numeric(coef(out)))
   ps_hat = yhat / sum(yhat)
-  rownames(ps_hat) = AllStates
+  rownames(ps_hat) = teachers_treat$state
   if(only.CT) {
     i = which(rownames(ps_hat)=="CT")
     return(c(ps_hat[i, ], AIC(out)))
   }
   
   ord = rev(order(ps_hat))
-  M = data.frame(a = rep(0, 13))
+  M = data.frame(a = rep(0, 11))
   # matrix(0, nrow=13, ncol=6)
   for(j in 1:3) {
-    j1 = 13 * (j-1) + 1
-    j_index = ord[seq(j1, j1 + 12)]
+    j1 = 11 * (j-1) + 1
+    j_index = ord[seq(j1, j1 + 10)]
     ps_j = round(as.numeric(ps_hat[j_index]), 4)
     names_j = rownames(ps_hat)[j_index]
     
@@ -131,3 +131,50 @@ synth_fisher = function(adoption, vars=c("nonwageppexpend", "studteachratio"), o
 }
 
 synth_fisher(teachers_treat)
+
+
+#' Try all possible combinations of models with X1, ... X6
+#' 
+#' @return Kx3 matrix that contains (pvalue, AIC, #vars) at each row
+#' 
+single_DATA_analysis = function(adoption, verbose=FALSE) {
+  # out = synth_fisher(adoption, vars = c("lnincome", "retprice"), FALSE)
+  
+  ## All models
+  print("- Checking all models with 1-5 variables...")
+  pvalues = matrix(0, nrow=0, ncol=3)
+  colnames(pvalues) = c("pvalue", "AIC", "vars")
+  
+  for(num_var in 1:5) {
+    # All num_var models
+    models = t(combn(colnames(teachers_full)[cols], num_var))
+    for(i in 1:nrow(models)) {
+      m = models[i, ]
+      # print(sprintf("Checking model"))
+      # print(m)
+      out = synth_fisher(adoption, vars = m, only.CT = TRUE)
+      pvalues = rbind(pvalues, c(out, num_var))
+    }
+  }
+  
+  rownames(pvalues) = NULL
+  #' pvalues = MATRIX (K x 3)
+  #'    pvalue  AIC  #vars.
+  #'         ....
+  return(as.data.frame(pvalues))
+}
+
+
+paper_analysis = function() {
+  # single_DATA_analysis(adoption_Data_2, colnames(smoking)[cols])
+  all_xnames = colnames(teachers_full)[cols]
+  out = synth_fisher(teachers_treat, vars=c("nonwageppexpend", "studteachratio"),verbose=T)
+  out
+  xtable(out, include.rownames=FALSE)
+  
+  ## Single data analysis
+  pvals = single_DATA_analysis(teachers_treat)
+  pvals[which.min(pvals$AIC), ]
+}
+
+paper_analysis()
